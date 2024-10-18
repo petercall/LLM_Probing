@@ -1,0 +1,12 @@
+#Folders not to track
+npy/
+data/
+outputs/
+__pycache__/
+
+#File types not to track
+*.csv
+*.npy
+*.png
+*.txt
+*.pyc
