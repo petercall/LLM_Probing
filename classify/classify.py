@@ -6,38 +6,48 @@ from matplotlib import pyplot as plt
 from tqdm import tqdm
 from vectorize_data import vectorize_data
 
-DATA_FILENAME = "../data/random_data.csv"
-COL = "data"
+NPY_DATA = True                                     #If True, it will load the data from a .npy file instead of a .csv file
+DATA_FILENAME = "../npy/answer_embeddings.npy"
+COL = "data"                                        #If NPY_DATA = True, this is ignored
 
-MIN_DF = 2
+MIN_DF = 2                                          #If NPY_DATA = True, these are all ignored
 MAX_DF = .7
 NGRAM = 1
 NUM_SING_VECTS = 150
 
-CLUSTERS = [8]
-KMEANS = False               #If True do KMeans, if False do Spectral Clustering (note: you can't do Silhouette visualization if you do Spectral Clustering)
+RANDOM_SUBSET = False                                #If True, it will take a random subset of the data
+RANDOM_SUBSET_SIZE = 30000                          #If RANDOM_SUBSET = True, this is the size of the random subset
 
-SILHOUETTES = False          #This can only be True if KMeans = True
-SAVE_SILHOUETTES = True    #If False it displays the silhouette plots isntead
-SILHOUETTE_FILENAME = "../outputs/Random_Question_Silhouette"   #It will save the files as: SILHOUETTE_FILENAME + "_" + str(num_clusters) + ".png"
+CLUSTERS = [9,10]
+KMEANS = True                                       #If True do KMeans, if False do Spectral Clustering (note: you can't do Silhouette visualization if you do Spectral Clustering)
 
-SAVE_TEXT = False           #If False it outputs the text to the terminal instead
-TEXT_FILENAME = "../outputs/Random_Question_Cluster_Results.txt"
+SILHOUETTES = True                                  #This can only be True if KMeans = True
+SAVE_SILHOUETTES = True                             #If False it displays the silhouette plots isntead
+SILHOUETTE_FILENAME = "../outputs/answer_embeddings"#Ignored if SAVE+SILHOUETTES = False. If True, it will save the files as: SILHOUETTE_FILENAME + "_" + str(num_clusters) + ".png"
 
-SAVE_NPY = False            #If True, this will save the data as a .npy file
+SAVE_TEXT = True                                    #If False it outputs the text to the terminal instead
+TEXT_FILENAME = "../outputs/answer_embedding_results.txt"
+
+SAVE_NPY = False                                    #Whether to save the labels vector (1D vector of size = # of data points)
 SAVE_NPY_FILENAME = "../npy/Random_Question_Data"   #If SAVE_NPY = True, this will save each cluster as a .npy file named: SAVE_NPY_FILENAME + "_" + str(num_clusters) + ".npy"
-SAVE_CSV = True            #iF True, this will save the labels as a new column. The column name for each cluster will be: {num_clusters}_clusters
-SAVE_CSV_FILENAME = "../data/random_data.csv"   #It saves the columns as: "{num_clusters}_clusters"
-
-
+SAVE_CSV = False                                    #Ignored if NPY_DATA = True. Otherwise, if this is True, it will save the labels as a new column to your original csv file. The column name it saves it under is: {num_clusters}_clusters
+SAVE_CSV_FILENAME = "../data/random_data.csv"       #It saves the columns as: "{num_clusters}_clusters"
 
 
 #Download the data and define what your data is
-data_df = pd.read_csv(DATA_FILENAME)
-data = data_df[COL]
+if NPY_DATA:
+    X = np.load(DATA_FILENAME)
+else:
+    data_df = pd.read_csv(DATA_FILENAME)
+    data = data_df[COL]
 
-#Vectorize the data
-X = vectorize_data(data, ngram = NGRAM, max_df = MAX_DF, min_df = MIN_DF, num_sing_vectors=NUM_SING_VECTS)
+    #Vectorize the data
+    X = vectorize_data(data, ngram = NGRAM, max_df = MAX_DF, min_df = MIN_DF, num_sing_vectors=NUM_SING_VECTS)
+    
+#Take a random subset of the data if desired
+if RANDOM_SUBSET:
+    random_indices = np.random.choice(X.shape[0], RANDOM_SUBSET_SIZE, replace=False)
+    X = X[random_indices]
 
 #Define the kmeans clustering algorithm
 for num_clusters in CLUSTERS:
@@ -95,13 +105,16 @@ for num_clusters in CLUSTERS:
     if SAVE_NPY:
         save_name = SAVE_NPY_FILENAME + "_" + str(num_clusters) + ".npy"
         np.save(save_name, labels)
-    elif SAVE_CSV:
-        column_name = f"{num_clusters}_clusters"
-        data_df[column_name] = labels
+    
+    if not NPY_DATA: 
+        if SAVE_CSV:
+            column_name = f"{num_clusters}_clusters"
+            data_df[column_name] = labels
     
 #Now save the csv file if desired
-if SAVE_CSV:
-    data_df.to_csv(SAVE_CSV_FILENAME, index = False)
+if not NPY_DATA:
+    if SAVE_CSV:
+        data_df.to_csv(SAVE_CSV_FILENAME, index = False)
         
         
     

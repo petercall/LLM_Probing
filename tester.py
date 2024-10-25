@@ -2,8 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from classify.vectorize_data import vectorize_data
-from sklearn.manifold import TSNE
+from sentence_transformers import SentenceTransformer
+from sklearn.cluster import KMeans
 
-my_df = pd.read_csv("data/random_data.csv")
-print(my_df["8_clusters"].value_counts()*100 / my_df["8_clusters"].value_counts().sum())
+
+#Load in the data
+# labels = np.load("npy/answer_embeddings_8.npy")
+# df = pd.read_csv("../data/complete_personas.csv")
+# df["answer_embeddings_8"] = labels
+# df.to_csv("data/complete_personas.csv", index=False)
+
 

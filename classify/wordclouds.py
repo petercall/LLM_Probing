@@ -9,7 +9,6 @@ CLUSTER_COL = "8_clusters"
 COL1 = "data"
 COL2 = None
 STOPWORDS_TO_ADD = ["question", "moderate", "difficulty", "subject"]
-# STOPWORDS_TO_ADD = ["passionate", "aspiring", "enthusiast", "retired", "former", "focus", "fellow", "passion", "enjoy", "specializing", "interested", "focus", "impact", "guidance", "seeking", "provide", "support", "eager", "want", "looking", "young", "learn", "improve", "relies", "passion", "looking", "known", "responsible", "responsible", "impact", "appreciate", "importance", "share", "interest", "provides", "insight", "focusing", "working", "shares", "particularly", "insights", "enjoy", "enjoys", "advice", "im", "specialize", "expertise", "understanding", "understand", "explore", "exploring", "specializes", "seek", "project", "providing", "loves", "love", "believe", "seeks", "believes", "advocate", "advocates", "new", "appreciates", "appreciate", ]
 BIGRAM = False
 MIN_FONT = 10
 
