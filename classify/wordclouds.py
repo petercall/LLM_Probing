@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 import string
 
-FILENAME = "../data/random_data.csv"
-CLUSTER_COL = "8_clusters"
+FILENAME = "../data/random_data3.csv"
+CLUSTER_COL = "data_supervised_labels"
 COL1 = "data"
-COL2 = None
-STOPWORDS_TO_ADD = ["question", "moderate", "difficulty", "subject"]
-BIGRAM = False
-MIN_FONT = 10
+COL2 = "classification"
+STOPWORDS_TO_ADD = ["microsoft"]                   #A list of stopwords to add, or None
+BIGRAM = True
+MIN_FONT = 13
 
 
 #Load in the data and specify your CLUSTER_COLumn of interest

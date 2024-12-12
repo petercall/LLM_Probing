@@ -3,12 +3,24 @@ from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from tqdm import tqdm
 
+
+DATA_FILENAME = "../data/random_data3.csv"
+DATA_COL_NAME = "data"
+CLASSIFICATION_COL_NAME = "classification"      #A new colun in the data frame will be created with this name, and the classifications will be stored here.
+
+CLASSIFICATION_PROMPT = "Give me a summary that is no longer than 5 words of the main subject that the following prompt falls into. Please return nothing else besides the subject."
+
+
+
 #Download the data
-complete_personas = pd.read_csv("complete_personas.csv", dtype = "object")
+data = pd.read_csv(DATA_FILENAME, dtype = "object")
+
+#Create a classification column in the data
+data[CLASSIFICATION_COL_NAME] = ""
 
 #Get the model and tokenizer location
-model_location = "../phi3_model"
-tokenizer_location = "../phi3_tokenizer"
+model_location = "../../data/phi3_model"
+tokenizer_location = "../../data/phi3_tokenizer"
 
 #Download the model and tokenizer
 model = AutoModelForCausalLM.from_pretrained(model_location,
@@ -39,26 +51,23 @@ messages = [
     {"role": "user", "content": ""}
 ]
 
-#Add in the classification to the "answer" category
-classification_prompt = "Give me a summary that is no longer than 5 words of the main subject that the following prompt falls into. Please return nothing else besides the subject.\n\nPrompt: "
+#Adjust the classification prompt
+CLASSIFICATION_PROMPT = CLASSIFICATION_PROMPT + "\n\nPrompt: " 
 
-#Get the start and end values for the questions to loop through
-start = complete_personas["classification"].count()
-end = complete_personas.shape[0]
 
-#Write a new question for each persona in "complete_personas"
-for i in tqdm(range(start, end)):
+#Write a new question for each persona in "data"
+for i in tqdm(range(data.shape[0])):
     #Input the prompt into the message
-    messages[1]["content"] = classification_prompt + complete_personas.loc[i, "answer"]
+    messages[1]["content"] = CLASSIFICATION_PROMPT + data.loc[i, DATA_COL_NAME]
 
     #Generate a question from the model
     output = phi_pipeline(messages, **generation_args)[0]["generated_text"]
 
     #Input the question into the "question" column of the dataset
-    complete_personas.loc[i,"classification"] = output
+    data.loc[i,CLASSIFICATION_COL_NAME] = output
 
-    if i % 450 == 0:
-        complete_personas.to_csv("complete_personas.csv", index = False)        
+    if i % 500 == 0:
+        data.to_csv(DATA_FILENAME, index = False)        
 
 #Save the dataset as a csv file
-complete_personas.to_csv("complete_personas.csv", index = False)
+data.to_csv(DATA_FILENAME, index = False)

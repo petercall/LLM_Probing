@@ -1,15 +1,21 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from classify.vectorize_data import vectorize_data
-from sentence_transformers import SentenceTransformer
-from sklearn.cluster import KMeans
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import pandas as pd
+from transformers import pipeline
 
 
-#Load in the data
-# labels = np.load("npy/answer_embeddings_8.npy")
-# df = pd.read_csv("../data/complete_personas.csv")
-# df["answer_embeddings_8"] = labels
-# df.to_csv("data/complete_personas.csv", index=False)
 
+#Download the data
+data = pd.read_csv("data/random_data3.csv", dtype = "object")
+
+new_data = data["data"].sample(10)
+for val in new_data:
+    print(val)
+    print()
+
+
+# print(data.info())
+# print(data["data_supervised_labels"].value_counts()*100 / data.shape[0])
 

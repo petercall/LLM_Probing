@@ -6,7 +6,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Normalizer
 from matplotlib import pyplot as plt
 from sklearn.manifold import TSNE
-from vectorize_data import vectorize_data
+from classify.old.vectorize_data import vectorize_data
 from tqdm import tqdm
 
 #Columns of interest and number of singular vectors
