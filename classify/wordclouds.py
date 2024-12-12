@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 import string
 
-FILENAME = "../data/random_data3.csv"
-CLUSTER_COL = "data_supervised_labels"
-COL1 = "data"
-COL2 = "classification"
-STOPWORDS_TO_ADD = ["microsoft"]                   #A list of stopwords to add, or None
+FILENAME = "../data/variableTemp_gemma.csv"
+CLUSTER_COL = "answer_labels_(8 clusters)"          #This is the column that holds the cluster labels (i.e. 0 to 7, or however many clusters you have)
+COL1 = "answer"                                     #This is the column you want to do a wordcloud on
+COL2 = None                                         #This is a second column you want to do a wordcloud on, which will be displayed next to the wordcloud of the first column on the same figure. Put None if you don't want a second column.
+STOPWORDS_TO_ADD = None                             #A list of stopwords to add, or None
 BIGRAM = True
 MIN_FONT = 13
 

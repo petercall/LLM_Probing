@@ -8,8 +8,8 @@ from old.vectorize_data import vectorize_data
 from old.sentence_embedding import embed
 
 
-DATA_FILENAME = "../data/random_data3.csv"
-COL = "data"                                        
+DATA_FILENAME = "../data/random_data_gemma.csv"
+COL = "answers"                                        
 
 EMBEDDINGS = False                                  #If True, it will embed the data using the SentenceTransformer model, if False it will use PCA and TF-IDF
 
@@ -21,17 +21,17 @@ NUM_SING_VECTS = 150
 RANDOM_SUBSET = False                               #If True, it will take a random subset of the data. This can be good to test out a couple of custer sizes via Silhouette visualization (which is much faster with smaller amounts of data)
 RANDOM_SUBSET_SIZE = 30000                          #If RANDOM_SUBSET = True, this is the size of the random subset. If RANDOM_SUBSET = False, this is ignored.
 
-CLUSTERS = [4,5,6]
-KMEANS = True                                       #If True do KMeans, if False do Spectral Clustering (note: you can't do Silhouette visualization if you do Spectral Clustering)
+CLUSTERS = [8]
+KMEANS = False                                       #If True do KMeans, if False do Spectral Clustering (note: you can't do Silhouette visualization if you do Spectral Clustering)
 
-SILHOUETTES = True                                  #This can only be True if KMeans = True
+SILHOUETTES = False                                  #This can only be True if KMeans = True
 SAVE_SILHOUETTES = False                             #If False it displays the silhouette plots isntead
 SILHOUETTE_FILENAME = "../outputs/answer_embeddings"#Ignored if SAVE_SILHOUETTES = False. If True, it will save the files as: SILHOUETTE_FILENAME + "_" + str(num_clusters) + ".png"
 
 SAVE_TEXT = False                                    #If False it outputs the text to the terminal instead
 TEXT_FILENAME = "../outputs/answer_embedding_results.txt"
 
-SAVE_CSV = False                                    #If True it saves the labels as a new column in the dataframe with the name: f"{COL}_labels_({num_clusters} clusters)"
+SAVE_CSV = True                                    #If True it saves the labels as a new column in the dataframe with the name: f"{COL}_labels_({num_clusters} clusters)"
 
 
 

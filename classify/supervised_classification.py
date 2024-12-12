@@ -7,8 +7,8 @@ import numpy as np
 from tqdm import tqdm
 
 #Hyperparameters
-DATA_FILE = "../data/random_data3.csv"
-COLS_OF_INT = ["data"]
+DATA_FILE = "../data/random_data_gemma.csv"
+COLS_OF_INT = ["answers"]
 TARGET_CLASSES = ["science", "business", "literature", "education", "sports", "history", "art", "data analysis"]
 MODEL_NAME = "facebook/bart-large-mnli"
 BATCH_SIZE = 64

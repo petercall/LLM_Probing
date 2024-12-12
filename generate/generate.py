@@ -15,30 +15,34 @@ BATCH = False                                  #Whether to do batch processing o
 BATCH_SIZE = 8                                 #Ignored if BATCH = False
 
 SAVE = False                                     #If SAVE = True, it saves the data to the STORAGE_LOCATION. If SAVE = False, it prints out the data.
-STORAGE_LOCATION = "../data/random_data_openelm.csv"    #Only used if SAVE = True
+STORAGE_LOCATION = "../data/variableTemp_llama.csv"    #Only used if SAVE = True
 
 QUESTION = "Output a question that you know something about. Output nothing but the question."
-MESSAGE_TO_PREPEND: str = "Finish the following question by picking up right where it left off: "
+MESSAGE_TO_PREPEND: str = "Finish the following question by picking up right where it left off: "   #Make sure to end this with a space
 
 MODEL_LOCATION = None                             #The location of the model OR NONE (Phi3 is at: "../../data/phi3_model")
-TOKENIZER_LOCATION = None                         #The location of the tokenizer OR NONE (Phi3 is at: "../../data/phi3_tokenizer")  
-MODEL = "apple/OpenELM-1_1B-Instruct"              #The model to use if MODEL_LOCATION is None
-TOKENIZER = "meta-llama/Llama-2-7b-hf"             #The tokenizer to use if TOKENIZER_LOCATION is None
-# MODEL_ARGS = {"device_map": "cuda", "torch_dtype": "auto", "trust_remote_code": True, "attn_implementation": "flash_attention_2"}   #The model args for Phi3
-# MODEL_ARGS = {"device_map": "auto", "torch_dtype": torch.bfloat16, "attn_implementation" : "flash_attention_2"}   #The model args for Gemma
-MODEL_ARGS = {"device_map": "cuda", "torch_dtype": "auto", "trust_remote_code": True}   #The model args for openelm
+MODEL = "meta-llama/Llama-3.2-3B-Instruct"        #The model to use if MODEL_LOCATION is None
 
-MESSAGES = 0                                #1 for system then user prompt, 0 for just user
+TOKENIZER_LOCATION = None                         #The location of the tokenizer OR NONE (Phi3 is at: "../../data/phi3_tokenizer")  
+TOKENIZER = "meta-llama/Llama-3.2-3B-Instruct"    #The tokenizer to use if TOKENIZER_LOCATION is None
+
+# MODEL_ARGS = {"device_map": "cuda", "torch_dtype": "auto", "trust_remote_code": True, "attn_implementation": "flash_attention_2"}     #model args for Phi3
+# MODEL_ARGS = {"device_map": "auto", "torch_dtype": torch.bfloat16, "attn_implementation" : "flash_attention_2"}                       #model args for Gemma
+MODEL_ARGS = {"device_map": "auto", "torch_dtype": torch.bfloat16}                                                                      #model args for Llama
+# MODEL_ARGS = {"device_map": "cuda", "torch_dtype": "auto", "trust_remote_code": True}                                                 #model args for openelm
+
+
+MESSAGES = 1                                #1 for system then user prompt, 0 for just user
 
 
 
 #Create the Pandas Data Frame
 if not BATCH:
-    my_series = pd.Series(""*AMOUNT_OF_DATA, dtype = "object")
+    my_series = pd.Series(""*AMOUNT_OF_DATA, dtype = "object", name = "answer")
 else:
     ser1 = pd.Series([""]*AMOUNT_OF_DATA)
     ser2 = pd.Series([QUESTION]*AMOUNT_OF_DATA)
-    my_df = pd.DataFrame({"answers": ser1, "questions":ser2})
+    my_df = pd.DataFrame({"answer": ser1, "question":ser2})
 
 #Get the model and tokenizer location
 if MODEL_LOCATION is None:
@@ -84,7 +88,7 @@ class MyDataset(Dataset):
         return self.data[i]
 
 if BATCH:
-    my_dataset = MyDataset(my_df["questions"])
+    my_dataset = MyDataset(my_df["question"])
 
 
 for i in range(NUM_ROUNDS):
@@ -102,24 +106,24 @@ for i in range(NUM_ROUNDS):
                 my_series.at[j] = pipe(messages, **generation_args)[0]["generated_text"]
             else:
                 messages[MESSAGES]["content"] = MESSAGE_TO_PREPEND + my_series.at[j]
-                my_series.at[j] = my_series.at[j] + pipe(messages, **generation_args)[0]["generated_text"]
+                my_series.at[j] = my_series.at[j] + " " + pipe(messages, **generation_args)[0]["generated_text"]
     else:
         for i, output in enumerate(tqdm(pipe(my_dataset, batch_size = BATCH_SIZE, **generation_args), total = len(my_dataset))):
             if i == 0:
-                my_df.at[i, 'answers'] = output[0]["generated_text"]
-                my_df["questions"] = MESSAGE_TO_PREPEND + my_df.at[i, "answers"]
-                print(my_df.at[i, "answers"])
-                print(my_df.at[i, "questions"])
+                my_df.at[i, 'answer'] = output[0]["generated_text"]
+                my_df["question"] = MESSAGE_TO_PREPEND + my_df.at[i, "answer"]
+                print(my_df.at[i, "answer"])
+                print(my_df.at[i, "question"])
                 print()
             else:
-                my_df.at[i, "answers"] = my_df["answers"][i] + output[0]["generated_text"]
-                my_df.at[i, "questions"] = MESSAGE_TO_PREPEND + my_df["answers"][i]
-                print(my_df.at[i, "answers"])
-                print(my_df.at[i, "questions"])
+                my_df.at[i, "answer"] = my_df["answer"][i] + " " + output[0]["generated_text"]
+                my_df.at[i, "question"] = MESSAGE_TO_PREPEND + my_df["answer"][i]
+                print(my_df.at[i, "answer"])
+                print(my_df.at[i, "question"])
                 print()
 
 if BATCH:
-    my_series = my_df["answers"]
+    my_series = my_df["answer"]
 
 #Truncate the series to include only up to the first question mark, or up to the MAX_LENGTH number of characters, whichever is lower
 my_series = (my_series.str.split("?", expand = True)[0] + "?").str[:MAX_LENGTH]         
