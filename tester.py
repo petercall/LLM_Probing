@@ -13,10 +13,10 @@ import kaggle, kagglehub
 import os
 
 #download the data
-# df = pd.read_csv("data/datasets/tiny_stories_subset_20000.csv", header = 0)
-# print(df)]
+df = pd.read_csv("data/model_output/variableTemp_phi3_500_[2.75]_bos.csv", header = 0)
+# print(df)
+df_sample = df.sample(10)
 
-
-AMOUNT_OF_DATA = 10
-my_series = pd.Series([""]*AMOUNT_OF_DATA, dtype = "object", name = "answer")
-print(my_series)
+for i, index in enumerate(df_sample.index):
+    print(f"{i}: {df_sample.at[index, "0"]}")
+    print()

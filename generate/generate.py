@@ -5,25 +5,25 @@ from tqdm import tqdm
 from torch.utils.data import Dataset
 import torch
 
-AMOUNT_OF_DATA = 10000
-NUM_ROUNDS = 4                                  #If you just want a single round, set this to 1
-TEMPERATURE_PER_ROUND = [2.75, 2, 1.5, 1]       #If NUM_ROUNDS = 1, set this to a single value inside a list (i.e. [1])
-MAX_TOKENS_PER_ROUND = [12, 12, 12, 20]            #If NUM_ROUNDS = 1, set this to a single value inside a list (i.e. [200])
+AMOUNT_OF_DATA = 500
+TEMPERATURE_PER_ROUND = [2]               #If you want a single round, set this to a single value inside a list (i.e. [1]). The one I have been doing most of the time is: [2.75, 2, 1.5, 1]
+MAX_TOKENS_PER_ROUND = [35]                 #If you want a single round, set this to a single value inside a list (i.e. [200]). The one I have been doing most of the time is: [12, 12, 12, 20]
 MAX_LENGTH = 180
 
 BATCH = False                                  #Whether to do batch processing or not. I haven't completely tested this yet, so put BATCH = False for now.
 BATCH_SIZE = 8                                 #Ignored if BATCH = False
 
 SAVE = True                                     #If SAVE = True, it saves the data to the STORAGE_LOCATION. If SAVE = False, it prints out the data.
-STORAGE_LOCATION = "../data/variableTemp_tinyStories.csv"    #Only used if SAVE = True
+STORAGE_LOCATION = "../data/model_output/variableTemp_phi3_500_[2]_bos.csv"    #Only used if SAVE = True
 
-QUESTION = "Output a question that you know something about. Output nothing but the question."
+# QUESTION = "Output a question that you know something about. Output nothing but the question."
+QUESTION = "<s>"
 MESSAGE_TO_PREPEND: str = "Finish the following question by picking up right where it left off: "   #Make sure to end this with a space
 
-MODEL_LOCATION = None                            #The location of the model OR NONE (Phi3 is at: "../../data/phi3_model")
+MODEL_LOCATION = "../../data/phi3_model"                            #The location of the model OR NONE (Phi3 is at: "../../data/phi3_model")
 MODEL = "roneneldan/TinyStories-33M"        #The model to use if MODEL_LOCATION is None. Ignored if MODEL_LOCATION is not None
 
-TOKENIZER_LOCATION = None                        #The location of the tokenizer OR NONE (Phi3 is at: "../../data/phi3_tokenizer")  
+TOKENIZER_LOCATION = "../../data/phi3_tokenizer"                        #The location of the tokenizer OR NONE (Phi3 is at: "../../data/phi3_tokenizer")  
 TOKENIZER = "roneneldan/TinyStories-33M"    #The tokenizer to use if TOKENIZER_LOCATION is None. Ignored if TOKENIZER_LOCATION is not None
 
 # MODEL_ARGS = {"device_map": "auto"}
@@ -32,7 +32,7 @@ MODEL_ARGS = {"device_map": "cuda", "torch_dtype": "auto", "trust_remote_code": 
 # MODEL_ARGS = {"device_map": "auto", "torch_dtype": torch.bfloat16}                                                                    #model args for Llama
 # MODEL_ARGS = {"device_map": "cuda", "torch_dtype": "auto", "trust_remote_code": True}                                                 #model args for openelm
 
-MESSAGES = None                      #1 for system then user prompt, 0 for just user, put None for the message to be a simple string and not a list
+MESSAGES = 1                      #1 for system then user prompt (for chatbot trained models like Phi3), 0 for just user (for models not trinaed in chat format), put None for the message to be a simple string and not a list (for tiny stories model)
 
 
 
@@ -97,7 +97,7 @@ if BATCH:
     my_dataset = MyDataset(my_df["question"])
 
 
-for i in range(NUM_ROUNDS):
+for i in range(len(TEMPERATURE_PER_ROUND)):
     generation_args = {
         "max_new_tokens": MAX_TOKENS_PER_ROUND[i],
         "return_full_text": False,
@@ -122,18 +122,18 @@ for i in range(NUM_ROUNDS):
                 
                 my_series.at[j] = my_series.at[j] + " " + pipe(messages, **generation_args)[0]["generated_text"]
     else:
-        for i, output in enumerate(tqdm(pipe(my_dataset, batch_size = BATCH_SIZE, **generation_args), total = len(my_dataset))):
+        for j, output in enumerate(tqdm(pipe(my_dataset, batch_size = BATCH_SIZE, **generation_args), total = len(my_dataset))):
             if i == 0:
-                my_df.at[i, 'answer'] = output[0]["generated_text"]
-                my_df["question"] = MESSAGE_TO_PREPEND + my_df.at[i, "answer"]
-                print(my_df.at[i, "answer"])
-                print(my_df.at[i, "question"])
+                my_df.at[j, 'answer'] = output[0]["generated_text"]
+                my_df["question"] = MESSAGE_TO_PREPEND + my_df.at[j, "answer"]
+                print(my_df.at[j, "answer"])
+                print(my_df.at[j, "question"])
                 print()
             else:
-                my_df.at[i, "answer"] = my_df["answer"][i] + " " + output[0]["generated_text"]
-                my_df.at[i, "question"] = MESSAGE_TO_PREPEND + my_df["answer"][i]
-                print(my_df.at[i, "answer"])
-                print(my_df.at[i, "question"])
+                my_df.at[j, "answer"] = my_df["answer"][j] + " " + output[0]["generated_text"]
+                my_df.at[j, "question"] = MESSAGE_TO_PREPEND + my_df["answer"][j]
+                print(my_df.at[j, "answer"])
+                print(my_df.at[j, "question"])
                 print()
 
 if BATCH:

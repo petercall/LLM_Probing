@@ -7,9 +7,9 @@ import numpy as np
 from tqdm import tqdm
 
 #Hyperparameters
-DATA_FILE = "../data/datasets/tiny_stories_subset_20000.csv"
+DATA_FILE = "../data/model_output/variableTemp_phi3_500_[2.75]_bos.csv"
 SUBSET_SIZE = None                    #If None it will use the entire dataset, if a number it will take a random subset of the dataset of this size
-COLS_OF_INT = ["text"]
+COLS_OF_INT = ["0"]
 TARGET_CLASSES = ["science", "mathematics", "business", "literature", "education", "sports", "history", "art", "computer programming", "law", "medicine"]
 MODEL_NAME = "facebook/bart-large-mnli"
 BATCH_SIZE = 64
@@ -94,4 +94,4 @@ for COL_OF_INT in COLS_OF_INT:
         if PARTIAL_SCORES:
             print(f"Label Order: {np.sort(TARGET_CLASSES)}")
             # print(f"Final Scores: {final_scores}")
-            print(f"Final Proportions: {final_scores/final_i}")
+            print(f"Final Proportions: {np.round((final_scores/final_i)*100,2)}")
