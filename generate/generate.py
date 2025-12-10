@@ -7,14 +7,14 @@ from torch.utils.data import Dataset
 
 
 #Hyperparameters--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-AMOUNT_OF_DATA = 2000
-TEMPERATURE_PER_ROUND = [.5, 1]                #If you want a single round, set this to a single value inside a list (i.e. [1]). The one I have been doing most of the time is: [2.75, 2, 1.5, 1]
-MAX_TOKENS_PER_ROUND = [25, 100]                 #If you want a single round, set this to a single value inside a list (i.e. [200]). The one I have been doing most of the time is: [12, 12, 12, 20]
+AMOUNT_OF_DATA = 150000
+TEMPERATURE_PER_ROUND = [1]                #If you want a single round, set this to a single value inside a list (i.e. [1]). The one I have been doing most of the time is: [2.75, 2, 1.5, 1]
+MAX_TOKENS_PER_ROUND = [100]                 #If you want a single round, set this to a single value inside a list (i.e. [200]). The one I have been doing most of the time is: [12, 12, 12, 20]
 MAX_LENGTH = 500                                #This is the maximum number of CHARACTERS (not tokens) that the output at each data point will be truncated to.
 
 SAVE = True                                     #If SAVE = True, it saves the data to the STORAGE_LOCATION. If SAVE = False, it prints out the data.
 COLUMN_NAME = "text"                            #If SAVE = True, then this is the column name in the dataframe that gets saved
-STORAGE_LOCATION = "../../../data/olmo/olmo_2000_generations_temp_.5.csv"    #Only used if SAVE = True
+STORAGE_LOCATION = "../../../data/olmo/olmo_150000_generations_temp_1.csv"    #Only used if SAVE = True
 
 # QUESTION = "<s>"                    #This is the BOS token for the Phi3 model
 QUESTION = "<|endoftext|>"          #This it the BOS token for the Olmo model
@@ -81,7 +81,7 @@ for i in range(len(TEMPERATURE_PER_ROUND)):
         "temperature" : float(TEMPERATURE_PER_ROUND[i])
     }
     print()
-    print(f"Generating {generation_args["max_new_tokens"]} new tokens at temperature {generation_args["temperature"]}")
+    print(f"Generating {generation_args['max_new_tokens']} new tokens at temperature {generation_args['temperature']}")
 
     #For the given temperature, loop through all of your data and generate the text
     for j in tqdm(range(AMOUNT_OF_DATA)):
