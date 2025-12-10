@@ -10,3 +10,6 @@ __pycache__/
 *.png
 *.txt
 *.pyc
+
+#Project-Specific
+tester.py

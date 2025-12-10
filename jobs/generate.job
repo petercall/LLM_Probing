@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#SBATCH -N 1				
+#SBATCH -n 1						
+#SBATCH -p gh
+#SBATCH -t 3:00:00			
+
+#SBATCH -A DMS25004 			
+#SBATCH -J generate       		
+#SBATCH -o /work/10509/ptc487/vista/research/llm_probing/outputs/logs/generate-%j.out 		
+#SBATCH -e /work/10509/ptc487/vista/research/llm_probing/outputs/logs/generate-%j.out         	
+#SBATCH --mail-type=all		
+#SBATCH --mail-user=peter.t.call@gmail.com
+
+#Load modules
+module purge
+module load TACC
+module load gcc cuda/12.6
+module load python3
+
+#Activate desired virtual environment
+source /work/10509/ptc487/vista/.venvs/general/bin/activate
+
+#Commands
+cd /work/10509/ptc487/vista/research/llm_probing/generate
+python generate.py
